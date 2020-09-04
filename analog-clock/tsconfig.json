@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ESNext",
+    "lib": ["ESNext", "dom"]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
