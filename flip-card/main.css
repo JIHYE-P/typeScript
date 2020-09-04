@@ -1,0 +1,90 @@
+* {
+  box-sizing: border-box;
+}
+.card {
+  width: 210px;
+  height: 260px;
+  display: inline-block;
+  position: relative;
+  margin: 10px;
+}
+.char {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}
+.flip {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+}
+.front-top {
+  background: red;
+  z-index: 2;
+  transform-origin: bottom;
+  backface-visibility: hidden;
+  animation: hide 1s linear infinite;
+}
+@keyframes hide {
+  0%{
+    transform: perspective(260px) rotateX(0deg);
+  }
+  100%{
+    transform: perspective(260px) rotateX(-180deg);
+  }
+}
+.front-bottom {
+  background: blue;
+  top: 50%;
+  z-index: 1;
+}
+.back-top {
+  background: olive;
+  z-index: 1;
+}
+.back-bottom {
+  background: steelblue;
+  top: 50%;
+  z-index: 3;
+  transform-origin: top;
+  backface-visibility: hidden;
+  animation: show 1s linear infinite;
+}
+@keyframes show {
+  0%{
+    transform: perspective(260px) rotateX(180deg);
+  }
+  100%{
+    transform: perspective(260px) rotateX(0deg);
+  }
+}
+.front-bottom .char {
+  top: -100%;
+}
+.back-bottom .char {
+  top: -100%;
+}
+.flip::after {  
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+.back-top::after,
+.front-top::after {
+  background: linear-gradient(to bottom, rgba(0,0,0,.1) 95%, rgba(0,0,0,.35) 100%);
+}
+.back-bottom::after,
+.front-bottom::after {
+  background: linear-gradient(to top, rgba(0,0,0,.1) 95%, rgba(109,110,113,.35) 100%);
+}
