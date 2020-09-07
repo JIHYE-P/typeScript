@@ -247,3 +247,104 @@ type tuple2<T, K> = (a: T, b: K) => [T, K];
 const sum: tuple2<string, number> = (a, b) => [a, b];
 const textSum: [string, number] = sum('a', 3)
 
+// 3. 제네릭 제약조건 (Generic Constraints)
+/**
+ * 프로퍼티 .length 를 가진 인터페이스를 생성하고.
+ * extends 키워드로 인터페이스를 명시
+ */
+interface Length {
+  length: number
+}
+const identity = <T extends Length>(arr: T): T => {
+  console.log(arr.length);
+  return arr;
+}
+identity('123456789');
+identity({length: 10, value: 3});
+identity([1,2,3,4,5]);
+
+/**
+ * keyof 키워드
+ * 인터페이스 프로퍼티의 키 값을 union 형태로 return
+ */
+interface Todo {
+  id: number,
+  text: string,
+  due: Date
+}
+// TodoKeys의 타입 "id" | "text" | "due"
+type TodoKeys = keyof Todo
+
+/**
+ * Partial<T>
+ * 타입T의 모든 프로퍼티를 Optional (물음표 키워드) 형태로 바꾸어준다.
+ * 
+ * type Partial<T> = { 
+ *  [P in keyof T]?: T[P];
+ * }
+ */
+interface User {
+  name: string,
+  age: number
+}
+const setUser1: User = {name: 'jihye', age: 29}
+// const setUser2: User = {name: 'minsu'} // Property 'age' is missing in type '{ name: string; }' but required in type 'User'
+
+const setUser3: Partial<User> = {age: 20}
+const setUser4: Partial<User> = {name: 'dong-su'}
+
+// type Pick<T, K extends keyof T> = {
+//   [P in K]: T[P];
+// };
+// type Omit<T, K extends keyof any> = Pick<T, Exclude<keyof T, K>>;
+
+// 제네릭 제약조건에서 타입 매개변수 사용 (Using Type Parameters in Generic Constraints)
+type Property<T, K extends keyof T> = (obj: T, key: K) => T[K];
+const value = {a: 1, b: 2, c: 3};
+const getProperty = <T, K extends keyof T>(obj: T, key: K) => obj[key];
+console.log(getProperty(value, 'a'));
+// console.log(getProperty(value, 'd')); // Argument of type '"d"' is not assignable to parameter of type '"a" | "b" | "c"'.
+
+
+type TypeKeyof = keyof HTMLElementTagNameMap;
+type TypePartialVideo = Partial<HTMLElementTagNameMap['video']>;
+type TypeExtendsKeyof<K> = K extends keyof HTMLElementTagNameMap ? HTMLElementTagNameMap[K] : never;
+
+class ElementCreate<K extends keyof HTMLElementTagNameMap> {
+  public readonly root: HTMLElementTagNameMap[K];
+  constructor(public tagName: K, public properties: Partial<HTMLElementTagNameMap[K]> = {}){
+    this.root = Object.assign(document.createElement(tagName), properties);
+  }
+}
+const element: ElementCreate<'img'> = new ElementCreate('img', {src: 'https://www.google.com/logos/doodles/2020/kim-sowols-118th-birthday-6753651837108317-l.png'});
+console.log(element);
+
+type CSSStylePartial = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
+// type CSSStylePartial = Partial<CSSStyleDeclaration>;
+type HTMLProperties<T> = Partial<{
+  [K in keyof T]: K extends 'style' ? CSSStylePartial : T[K];
+}>;
+type TagFactory<T extends HTMLElement> = (p?: HTMLProperties<T>) => T;
+
+const createElement: <K extends keyof HTMLElementTagNameMap>(t: K, p?: HTMLProperties<HTMLElement>) => HTMLElementTagNameMap[K] = (tagName, properties = {}) => {
+  return Object.assign(document.createElement(tagName), properties);
+}
+const createTagFactory: <K extends keyof HTMLElementTagNameMap>(t: K) => TagFactory<HTMLElementTagNameMap[K]> = tagName => properties => {
+  return createElement(tagName, properties);
+}
+
+const Video: TagFactory<HTMLVideoElement> = createTagFactory('video');
+const Div: TagFactory<HTMLDivElement> = createTagFactory('div');
+const Span: TagFactory<HTMLSpanElement> = createTagFactory('span');
+const Button: TagFactory<HTMLButtonElement> = createTagFactory('button');
+
+Video({
+  loop: true,
+  // abc: true,
+  style: {
+    width: '200px',
+    padding: 0
+  }
+});
+
+

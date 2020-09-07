@@ -1,5 +1,6 @@
 import './style.css';
 const sleep = (ms: number) : Promise<void> => new Promise(res => setTimeout(res, ms));
+
 class Canvas {
   protected readonly canvas: HTMLCanvasElement;
   protected readonly ctx: CanvasRenderingContext2D;
@@ -51,21 +52,21 @@ class MaskImage extends Canvas {
     return mask.getImage();
   }
 }
-class ElementBuilder {
-  protected readonly root: HTMLElement;
-  constructor(public tagName: string, public properties: object = {}){
+class ElementBuilder<K extends keyof HTMLElementTagNameMap> {
+  protected readonly root: HTMLElementTagNameMap[K];
+  constructor(public tagName: K, public properties: Partial<HTMLElementTagNameMap[K]> = {}){
     this.root = Object.assign(document.createElement(tagName), properties)
   } 
   public setStyle(obj: object){
     Object.assign(this.root.style, obj);
   }
-  public setClass(...className: Array<string>){
+  public setClass(...className: string[]){
     this.root.classList.add(...className);
   }
-  public removeClass(...className: Array<string>){
+  public removeClass(...className: string[]){
     this.root.classList.remove(...className);
   }
-  public appendTo(obj: ElementBuilder | Node) : this {
+  public appendTo(obj: ElementBuilder<K> | Node) : this {
     if(obj instanceof Node) obj.appendChild(this.root);
     else if (obj instanceof ElementBuilder) obj.root.appendChild(this.root);
     return this;
@@ -77,19 +78,19 @@ class ElementBuilder {
     this.root.offsetHeight;
   }
 }
-class CharCard extends ElementBuilder {
+class CharCard extends ElementBuilder<'div'> {
   constructor(char: string, {height}: {height: number}){
-    super('div');
+    super('div', {});
+    this.setClass('char');
+    this.change(String(char).slice(0, 1));
     this.setStyle({
       height: `${height}px`
     });
-    this.setClass('char');
-    this.change(String(char).slice(0, 1));
   }
 }
-class FlipAnimate extends ElementBuilder {
-  constructor(tagName: string){
-    super(tagName);
+class FlipAnimate extends ElementBuilder<'div'> {
+  constructor(){
+    super('div', {});
   }
   protected flipAction(className: string, timeout: number) : Promise<void> {
     return new Promise(res => {
@@ -102,12 +103,12 @@ class FlipAnimate extends ElementBuilder {
     })
   }
 }
-class HalfCard extends ElementBuilder {
+class HalfCard extends ElementBuilder<'div'> {
   private readonly charCard: CharCard;
   private readonly maskTopImg: Promise<HTMLImageElement>
   private readonly maskBottomImg: Promise<HTMLImageElement>
   constructor(char: string, className: string, {width, height}: {width: number, height: number}, {maskCW, maskCH}: {maskCW: number, maskCH: number}){
-    super('div');
+    super('div', {});
     this.setClass('half', className);
     
     this.charCard = new CharCard(char, {height});
@@ -133,7 +134,7 @@ class FlipCard extends FlipAnimate {
   private readonly backBottom: HalfCard;
   private char: string;
   constructor(char: string, {width, height, fontSize} : {width: number, height: number, fontSize: number}, {maskCW, maskCH}: {maskCW: number, maskCH: number}){
-    super('div');
+    super();
     this.setStyle({
       width: `${width}px`,
       height: `${height}px`,
