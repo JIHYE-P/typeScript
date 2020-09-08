@@ -323,36 +323,40 @@ type CSSStylePartial = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
 type HTMLProperties<T> = Partial<{[K in keyof T]: K extends 'style' ? CSSStylePartial : T[K]}>;
 type TagFactory<T extends HTMLElement> = (p?: HTMLProperties<T>) => T;
 
-// const createElement: <K extends keyof HTMLElementTagNameMap>(t: K, p?: HTMLProperties<HTMLElement>) => HTMLElementTagNameMap[K] = (tagName, properties = {}) => {
-//   return Object.assign(document.createElement(tagName), properties);
-// }
-// const createTagFactory: <K extends keyof HTMLElementTagNameMap>(t: K) => TagFactory<HTMLElementTagNameMap[K]> = tagName => properties => {
-//   return createElement(tagName, properties);
-// }
-
-// const Video: TagFactory<HTMLVideoElement> = createTagFactory('video');
-// const Div: TagFactory<HTMLDivElement> = createTagFactory('div');
-// const Span: TagFactory<HTMLSpanElement> = createTagFactory('span');
-// const Button: TagFactory<HTMLButtonElement> = createTagFactory('button');
-
-// Video({
-//   loop: true,
-//   style: {
-//     width: '200px',
-//     padding: 0
-//   }
-// });
-
 const createElement: <K extends keyof HTMLElementTagNameMap>(t: K, p?: HTMLProperties<HTMLElement>) => HTMLElementTagNameMap[K] = (tagName, properties = {}) => {
   return Object.assign(document.createElement(tagName), properties);
 }
-createElement('canvas');
 const createTagFactory: <K extends keyof HTMLElementTagNameMap>(t: K) => TagFactory<HTMLElementTagNameMap[K]> = tagName => properties => {
   return createElement(tagName, properties);
 }
-const canvas: TagFactory<HTMLCanvasElement> = createTagFactory('canvas');
-canvas({
+
+const Video: TagFactory<HTMLVideoElement> = createTagFactory('video');
+const Div: TagFactory<HTMLDivElement> = createTagFactory('div');
+const Span: TagFactory<HTMLSpanElement> = createTagFactory('span');
+const Button: TagFactory<HTMLButtonElement> = createTagFactory('button');
+
+Video({
+  loop: true,
+  hidden: true,
+  display: true,
   style: {
-    width: 100
+    width: '200px',
+    padding: 0
   }
-})
+});
+
+
+interface Animal {
+  extinct: boolean;
+  race: string;
+}
+const animal: Animal = {
+  extinct: false,
+  race: "dog"
+};
+function getKeyValue<T, K extends keyof T>(obj: T, key: K) {
+  return obj[key];
+}
+const animalRace = getKeyValue(animal, "race");
+// const animalAge = getKeyValue(animal, "age"); 
+

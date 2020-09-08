@@ -52,9 +52,12 @@ class MaskImage extends Canvas {
     return mask.getImage();
   }
 }
+type CSSStylePartial = Partial<Record<keyof CSSStyleDeclaration, unknown>>
+type HTMLProperties<T> = Partial<{[K in keyof T]: K extends 'style' ? CSSStylePartial : T[K]}>
+
 class ElementBuilder<K extends keyof HTMLElementTagNameMap> {
   protected readonly root: HTMLElementTagNameMap[K];
-  constructor(public tagName: K, public properties: Partial<HTMLElementTagNameMap[K]> = {}){
+  constructor(public tagName: K, public properties?: HTMLProperties<HTMLElement>){
     this.root = Object.assign(document.createElement(tagName), properties)
   } 
   public setStyle(obj: object){
@@ -80,7 +83,7 @@ class ElementBuilder<K extends keyof HTMLElementTagNameMap> {
 }
 class CharCard extends ElementBuilder<'div'> {
   constructor(char: string, {height}: {height: number}){
-    super('div', {});
+    super('div');
     this.setClass('char');
     this.change(String(char).slice(0, 1));
     this.setStyle({
@@ -90,7 +93,7 @@ class CharCard extends ElementBuilder<'div'> {
 }
 class FlipAnimate extends ElementBuilder<'div'> {
   constructor(){
-    super('div', {});
+    super('div');
   }
   protected flipAction(className: string, timeout: number) : Promise<void> {
     return new Promise(res => {
@@ -108,7 +111,7 @@ class HalfCard extends ElementBuilder<'div'> {
   private readonly maskTopImg: Promise<HTMLImageElement>
   private readonly maskBottomImg: Promise<HTMLImageElement>
   constructor(char: string, className: string, {width, height}: {width: number, height: number}, {maskCW, maskCH}: {maskCW: number, maskCH: number}){
-    super('div', {});
+    super('div');
     this.setClass('half', className);
     
     this.charCard = new CharCard(char, {height});
