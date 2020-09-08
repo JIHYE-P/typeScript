@@ -320,31 +320,39 @@ const element: ElementCreate<'img'> = new ElementCreate('img', {src: 'https://ww
 console.log(element);
 
 type CSSStylePartial = Partial<Record<keyof CSSStyleDeclaration, unknown>>;
-// type CSSStylePartial = Partial<CSSStyleDeclaration>;
-type HTMLProperties<T> = Partial<{
-  [K in keyof T]: K extends 'style' ? CSSStylePartial : T[K];
-}>;
+type HTMLProperties<T> = Partial<{[K in keyof T]: K extends 'style' ? CSSStylePartial : T[K]}>;
 type TagFactory<T extends HTMLElement> = (p?: HTMLProperties<T>) => T;
+
+// const createElement: <K extends keyof HTMLElementTagNameMap>(t: K, p?: HTMLProperties<HTMLElement>) => HTMLElementTagNameMap[K] = (tagName, properties = {}) => {
+//   return Object.assign(document.createElement(tagName), properties);
+// }
+// const createTagFactory: <K extends keyof HTMLElementTagNameMap>(t: K) => TagFactory<HTMLElementTagNameMap[K]> = tagName => properties => {
+//   return createElement(tagName, properties);
+// }
+
+// const Video: TagFactory<HTMLVideoElement> = createTagFactory('video');
+// const Div: TagFactory<HTMLDivElement> = createTagFactory('div');
+// const Span: TagFactory<HTMLSpanElement> = createTagFactory('span');
+// const Button: TagFactory<HTMLButtonElement> = createTagFactory('button');
+
+// Video({
+//   loop: true,
+//   style: {
+//     width: '200px',
+//     padding: 0
+//   }
+// });
 
 const createElement: <K extends keyof HTMLElementTagNameMap>(t: K, p?: HTMLProperties<HTMLElement>) => HTMLElementTagNameMap[K] = (tagName, properties = {}) => {
   return Object.assign(document.createElement(tagName), properties);
 }
+createElement('canvas');
 const createTagFactory: <K extends keyof HTMLElementTagNameMap>(t: K) => TagFactory<HTMLElementTagNameMap[K]> = tagName => properties => {
   return createElement(tagName, properties);
 }
-
-const Video: TagFactory<HTMLVideoElement> = createTagFactory('video');
-const Div: TagFactory<HTMLDivElement> = createTagFactory('div');
-const Span: TagFactory<HTMLSpanElement> = createTagFactory('span');
-const Button: TagFactory<HTMLButtonElement> = createTagFactory('button');
-
-Video({
-  loop: true,
-  // abc: true,
+const canvas: TagFactory<HTMLCanvasElement> = createTagFactory('canvas');
+canvas({
   style: {
-    width: '200px',
-    padding: 0
+    width: 100
   }
-});
-
-
+})
