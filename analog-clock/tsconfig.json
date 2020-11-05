@@ -2,9 +2,14 @@
   "compilerOptions": {
     "strict": true,
     "target": "ESNext",
-    "lib": ["ESNext", "dom"]
+    "lib": ["ESNext", "dom"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "exclude": [
     "node_modules"
-  ]
+  ],
+  "watch": true
 }

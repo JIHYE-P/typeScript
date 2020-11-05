@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "strict": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["./src/*"]
+    },
     "target": "ESNext",
     "lib": ["ESNext", "dom"],
     "module": "commonjs"

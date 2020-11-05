@@ -1,3 +1,7 @@
+import {sleep} from '@/utils/index';
+
+console.log(sleep)
+
 class ElementBuilder {
   public readonly root: HTMLElement;
   constructor(public tagName: string){
