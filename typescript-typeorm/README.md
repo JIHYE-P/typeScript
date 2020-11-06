@@ -70,7 +70,7 @@ TYPEORM_ENTITIES=src/entity/*.ts
 ```
 
 # typeORM
-> [typeorm](https://typeorm.io/#/)
+> [typeorm 공식문서](https://typeorm.io/#/)
 
 ## ManyToMany
 > [typeorm doc 참고](https://typeorm.io/#/many-to-many-relations)
