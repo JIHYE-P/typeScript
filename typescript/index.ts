@@ -338,8 +338,8 @@ const Button: TagFactory<HTMLButtonElement> = createTagFactory('button');
 Video({
   loop: true,
   hidden: true,
-  display: true,
   style: {
+    display: 'block',
     width: '200px',
     padding: 0
   }
