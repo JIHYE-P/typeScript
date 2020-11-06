@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "lib": [ "ESNext", "DOM" ],
+    "target": "ESNext",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "./dist",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "sourceMap": false,
+    "plugins": [{
+      "transform": "@zerollup/ts-transform-paths"
+    }],
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["*"],
+      "@/*": ["./src/*"]
+    },
+    "typeRoots": ["node_modules/@types", "node_modules/@hashsnap"]
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules"]
+}
