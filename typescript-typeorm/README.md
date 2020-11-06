@@ -69,6 +69,88 @@ TYPEORM_ENTITIES=src/entity/*.ts
 }
 ```
 
+# typeORM
+> [typeorm](https://typeorm.io/#/)
+
+## ManyToMany
+> [typeorm doc 참고](https://typeorm.io/#/many-to-many-relations)
+
+다 대 다 관계는 A와 B의 여러 인스턴스를 포함하고, B가 A의 여러 인스턴스를 포함하는 객체이다. 예를 들어 `post`와`category` 엔티티를 살펴보면, 포스트에는 여러 카테고리가 있을 수 있고, 카테고리에는 여러 포스트들이 있을 수 있다. `@JoinTable() @ManyToMany()` 관계가 필요하고, `@JoinTable()`은 한 쪽에 소유해야한다.
+
+* `Category.ts`
+```ts
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from "typeorm";
+
+@Entity()
+export class Category {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  name: string;  
+}
+```
+
+* `Post.ts`
+```ts
+import {Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable} from "typeorm";
+import {Category} from './Category';
+
+@Entity()
+export class Post {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  title: string;
+
+  //각 PRIMARY KEY로 column 생성
+  @ManyToMany(type => Category, {
+    cascade: true
+  })
+  @JoinTable()
+  categories: Category[];
+}
+```
+위 엔티티는 다음과 같이 테이블이 생성된다.
+
+| category | | |
+|:----------|:----------|:----------|
+| id | init(11) | PRIMARY KEY AUTO_INCREMENT
+| name | varchar(255) |  
+
+
+| post | | |
+|:----------|:----------|:----------|
+| id | init(11) | PRIMARY KEY AUTO_INCREMENT
+| title | varchar(255) |  
+
+
+| post_categories_post | | |
+|:----------|:----------|:----------|
+| postId | init(11) | PRIMARY KEY AUTO_INCREMENT
+| categoryId | init(11) | PRIMARY KEY AUTO_INCREMENT
+
+### ManyToMany 데이터 저장하기
+```ts
+createConnection().then(async connection => {
+  const newCategory = new Category;
+  newCategory.name = 'typescript';
+  await connection.manager.save(newCategory);
+
+  const categoryRepository = connection.getRepository(Category);
+  const react = await categoryRepository.findOne(2);
+
+  const post = new Post;
+  const postRepository = connection.getRepository(Post);
+
+  post.title = 'new post';
+  post.text = 'new post upload';
+  post.categories = [newCategory, react];
+  await postRepository.save(post);
+}).catch(err => console.log('TypeORM connection error: ', err));
+```
+
 
 
 

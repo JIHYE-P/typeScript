@@ -1,19 +1,41 @@
 import "reflect-metadata";
 import {createConnection} from "typeorm";
-import {User} from "./entity/User";
+import {Request, Response} from 'express';
+import * as express from 'express';
+import * as bodyParser from 'body-parser';
+import { AppRoutes } from "./routes";
+import { Category } from "./entity/Category";
+import { Post } from "./entity/Post";
 
+// Connect typeORM mysql
 createConnection().then(async connection => {
-  console.log("Inserting a new user into the database...");
-  const user = new User();
-  user.firstName = "Timber";
-  user.lastName = "Saw";
-  user.age = 25;
-  await connection.manager.save(user);
-  console.log("Saved a new user with id: " + user.id);
+  const newCategory = new Category;
+  newCategory.name = 'typescript';
+  await connection.manager.save(newCategory);
 
-  console.log("Loading users from the database...");
-  const users = await connection.manager.find(User);
-  console.log("Loaded users: ", users);
+  const categoryRepository = connection.getRepository(Category);
+  const react = await categoryRepository.findOne(2);
 
-  console.log("Here you can setup and run express/koa/any other framework.");
-}).catch(error => console.log(error));
+  const post = new Post;
+  const postRepository = connection.getRepository(Post);
+
+  post.title = '[20201111] post upload';
+  post.text = '11월11일 빼빼로 데이~';
+  post.categories = [newCategory, react];
+  await postRepository.save(post);
+  
+  // create express server'
+  const app = express();
+  app.set('port', process.env.PORT || 3000);
+  app.use(bodyParser.json());
+
+  AppRoutes.forEach(route => {
+    app[route.method](route.path, (request: Request, response: Response, next: Function) => {
+      route.action(request, response).then(() => next).catch(err => next(err));
+    })
+  });
+
+  app.listen(app.get('port'), () => {
+    console.log(`Express application is up and running on port ${app.get('port')} / http://localhost:3000`);
+  });
+}).catch(err => console.log('TypeORM connection error: ', err));
