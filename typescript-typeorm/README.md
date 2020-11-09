@@ -204,6 +204,7 @@ await connection.manager.save(photo2);
 ```
 
 ### QueryBuilder
+> [select-query-builder 공식문서](https://typeorm.io/#/select-query-builder)
 ```ts
 import {getRepository} from 'typeorm';
 
@@ -220,5 +221,14 @@ Repository를 이용해 queryBuilder를 작성하는 방식이다.
 DB에서 단일의 결과를 가져오려면 `.getOne()`, 여러 개의 결과를 가져오려면 `getMany()`를 사용하면 된다.     
 특정 데이터를 가져와야할 때 entity가 아니라 **raw data**이다. 이런 결과값을 가져올 때는 `.getRawOne()`, `.getRawMany()`를 사용하여 가져오면 된다.
 
+### Query Join
 
-
+```ts
+const photos = await getRepository(Photo)
+  .createQueryBuilder('photo')
+  .leftJoinAndSelect('photo.user', 'user')
+  .where('photo.userId = :userId', {userId: 7})
+  .getMany();
+  console.log(photos)
+```
+`Photo`테이블에서 1:N으로 관계되어져 있는 `user` 정보를 Left Join해서 원하는 데이터를 가져오는

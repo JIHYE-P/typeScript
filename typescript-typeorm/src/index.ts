@@ -40,7 +40,14 @@ createConnection().then(async connection => {
   .createQueryBuilder('user')
   .where('user.age = :age', {age: 20})
   .getMany()
-  console.log(user)
+  // console.log(user);
+
+  const photos = await getRepository(Photo)
+  .createQueryBuilder('photo')
+  .leftJoinAndSelect('photo.user', 'user')
+  .where('photo.userId = :userId', {userId: 7})
+  .getMany();
+  console.log(photos)
 
   // create express server'
   const app = express();
