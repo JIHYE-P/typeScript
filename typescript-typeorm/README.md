@@ -150,7 +150,75 @@ createConnection().then(async connection => {
   await postRepository.save(post);
 }).catch(err => console.log('TypeORM connection error: ', err));
 ```
+### ManyToOne / OneToMany
 
+User, Photo 테이블이 있다고 가정했을 때, user는 여러 장의 사진을 가질 수 있지만, 각 사진은 한명의 사용자만 소유합니다.
+
+```ts
+import {Entity, PrimaryGeneratedColumn, Column, ManyToOne} from "typeorm";
+import { User } from "./User";
+
+@Entity()
+export class Photo {
+  @PrimaryGeneratedColumn()
+  id: number;
+
+  @Column()
+  url: string;
+
+  @ManyToOne(() => User, user => user.photos)
+  user: User;
+}
+```
+```ts
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany} from "typeorm";
+import { Photo } from "./Photo";
+
+@Entity()
+export class User {
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column()
+    name: string;
+
+    @OneToMany(() => Photo,photo => photo.user)
+    photos: Photo[];
+}
+```
+
+```ts
+const user = new User();
+user.name = "Leo";
+await connection.manager.save(user);
+
+const photo1 = new Photo();
+photo1.url = "me.jpg";
+photo1.user = user;
+await connection.manager.save(photo1);
+
+const photo2 = new Photo();
+photo2.url = "me2.jpg";
+photo2.user = user;
+await connection.manager.save(photo2);
+```
+
+### QueryBuilder
+```ts
+import {getRepository} from 'typeorm';
+
+const user = await getRepository(User)
+  .createQueryBuilder('user')
+  .where('user.age = :age', {age: 20})
+  .getMany() 
+  console.log(user)
+```
+Repository를 이용해 queryBuilder를 작성하는 방식이다.      
+여기서 `createQueryBuilder("user")`에서 user는 SQL alias이다. mysql을 예로 들자면 `SELECT users AS user` 이런 느낌이라고 할 수 있겠다. 이것은 어디서든 사용할 수 있다. 여기서 사용하는 `user`는 테이블 명을 의미하고, '.' 아래로 써 내려가는 `sql query`에서 사용할 수 있다.     
+하나의 query builder는 한 개의 alias만 가질 수 있는게 아니라 여러 개의 alias를 가질 수 있다. 여러 테이블마다 alias를 가지게 할 수 있고, 여러 테이블을 join할 수 도 있다.
+
+DB에서 단일의 결과를 가져오려면 `.getOne()`, 여러 개의 결과를 가져오려면 `getMany()`를 사용하면 된다.     
+특정 데이터를 가져와야할 때 entity가 아니라 **raw data**이다. 이런 결과값을 가져올 때는 `.getRawOne()`, `.getRawMany()`를 사용하여 가져오면 된다.
 
 
 

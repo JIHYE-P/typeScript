@@ -1,11 +1,13 @@
 import "reflect-metadata";
-import {createConnection} from "typeorm";
+import {createConnection, getRepository, getTreeRepository} from "typeorm";
 import {Request, Response} from 'express';
 import * as express from 'express';
 import * as bodyParser from 'body-parser';
 import { AppRoutes } from "./routes";
 import { Category } from "./entity/Category";
 import { Post } from "./entity/Post";
+import { User } from "./entity/User";
+import { Photo } from "./entity/Photo";
 
 const savePostByCategory = async (connection, categoryId: Number) => {
   const newCategory = new Category;
@@ -34,6 +36,11 @@ const findPostByCategory = async(connection) => {
 createConnection().then(async connection => {
   // await savePostByCategory(connection, 2);
   // await findPostByCategory(connection);
+  const user = await getRepository(User)
+  .createQueryBuilder('user')
+  .where('user.age = :age', {age: 20})
+  .getMany()
+  console.log(user)
 
   // create express server'
   const app = express();
