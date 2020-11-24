@@ -232,3 +232,5 @@ const photos = await getRepository(Photo)
   console.log(photos)
 ```
 `Photo`테이블에서 1:N으로 관계되어져 있는 `user` 정보를 Left Join해서 원하는 데이터를 가져오는
+
+### 
